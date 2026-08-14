@@ -11,10 +11,14 @@
   (let [fmt (DateTimeFormatter/ofPattern "yyyy-MM-dd'T'HH:mm:ss'Z'")]
     (.format fmt (.atZone (Instant/now) (java.time.ZoneId/of "Z")))))
 
-(defn git-revision []
+(defn git-revision
+  "Current revision SHA for the git HEAD"
+  []
   (-> (sh "git" "rev-parse" "HEAD") :out str/trim))
 
-(defn revision-span [timestamp sha]
+(defn revision-span
+  "Generate a version span with time of build and git commit used to build."
+  [timestamp sha]
   (str "<span id=\"revision\" title=\""
        timestamp
        "\"><code>rev:"
@@ -44,7 +48,10 @@
         manifest-db (edn/read-string (slurp manifest-file))]
     (fs/file-name (get manifest-db release-build))))
 
-(defn build-static-site [& opts]
+(defn build-static-site
+  "Build a directory in `to` containing js release, index file and any other sources in
+  the `from` directory."
+  [& opts]
   (let [{:keys [build-dir from to release]} (default-opts opts)
         js-dir (str to "/js")
         release-base (fs/file-name (fs/strip-ext release))
