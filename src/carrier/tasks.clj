@@ -30,7 +30,14 @@
          :release (or release "release-main.js")
          :index-file (or index-file "index.html")))
 
-(defn release-file [opts]
+(defn release-file
+  "Calculate the release name including the uniqueness slug.
+
+  It reads the figwheel manifest to translate from a release like
+  \"target/public/cljs-out/release-main.js\" to
+  \"target/public/cljs-out/release-main-SHA.js\", so that the correct filename
+  can be inserted in the index file. "
+  [opts]
   (let [{:keys [build-dir manifest release]} (default-opts opts)
         manifest-file (str build-dir manifest)
         release-build (str build-dir release)
@@ -50,7 +57,20 @@
       (fs/copy js js-dir))
     (bt/shell "bash" "-c" (str "ls -hs --format=single-column " js-dir release-glob))))
 
-(defn rewrite-index [& opts]
+(defn rewrite-index
+  "Rewrite the `index.html` for release.
+
+  By default Figwheel references a dev release for each build, for publishing
+  remotely, rewrite the `release-file` to include the released SHA slug so that
+  it invalidates cache on load.
+
+  If `base-href` appears in the index, replace with the value in `base-href`.
+  Helps for correctly setting a base URL if all of the navigation is using
+  push_state to adjust the URL on the client.
+
+  Finally, replaces a span with id revision with a current date/time of release
+  and last git commit of the release."
+  [& opts]
   (let [{:keys [index-file from to base-href] :as opts} (default-opts opts)
         from-index (str (fs/path from index-file))
         to-index (str (fs/path to index-file))
