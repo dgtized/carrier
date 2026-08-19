@@ -2,19 +2,8 @@
   (:require [babashka.fs :as fs]
             [babashka.tasks :as bt]
             [clojure.edn :as edn]
-            [clojure.java.shell :as shell :refer [sh]]
-            [clojure.string :as str])
-  (:import java.time.format.DateTimeFormatter
-           java.time.Instant))
-
-(defn timestamp-iso8601 []
-  (let [fmt (DateTimeFormatter/ofPattern "yyyy-MM-dd'T'HH:mm:ss'Z'")]
-    (.format fmt (.atZone (Instant/now) (java.time.ZoneId/of "Z")))))
-
-(defn git-revision
-  "Current revision SHA for the git HEAD"
-  []
-  (-> (sh "git" "rev-parse" "HEAD") :out str/trim))
+            [clojure.string :as str]
+            [carrier.revision :as cr]))
 
 (defn revision-span
   "Generate a version span with time of build and git commit used to build."
@@ -81,8 +70,8 @@
   (let [{:keys [index-file from to base-href] :as opts} (default-opts opts)
         from-index (str (fs/path from index-file))
         to-index (str (fs/path to index-file))
-        revision (git-revision)
-        timestamp (timestamp-iso8601)
+        revision (cr/git-revision)
+        timestamp (cr/timestamp-iso8601)
         contents (slurp from-index)]
     (println "[carrier] Rewriting" from-index "->" to-index)
     (println "  build:" timestamp "rev:" revision)
