@@ -5,6 +5,11 @@
             [clojure.string :as str]
             [carrier.revision :as cr]))
 
+(defn clean [& dirs]
+  (doseq [dir dirs]
+    (println (format "[carrier] Cleaning %s" dir))
+    (fs/delete-tree dir)))
+
 (defn revision-span
   "Generate a version span with time of build and git commit used to build."
   [timestamp sha]
