@@ -13,8 +13,7 @@ The basic idea is that a basic `bb.edn` like below can clean, compile and constr
  {:requires ([babashka.fs :as fs]
              [carrier.tasks :as t])
   clean
-  {:task (do (println "Remove target directory")
-          (fs/delete-tree "target"))}
+  {:task (t/clean "target" "static-site")}
   compile
   {:depends [clean]
    :doc "Compile release with figwheel"
