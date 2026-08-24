@@ -1,6 +1,6 @@
 (ns carrier.tasks
   (:require [babashka.fs :as fs]
-            [babashka.tasks :as bt]
+            [babashka.process :as bp]
             [clojure.edn :as edn]
             [clojure.string :as str]
             [carrier.revision :as cr]))
@@ -56,7 +56,7 @@
     (fs/create-dirs js-dir)
     (doseq [js (fs/glob build-dir (str "**" release-base "*"))]
       (fs/copy js js-dir))
-    (bt/shell "bash" "-c" (str "ls -hs --format=single-column " js-dir release-glob))))
+    (bp/shell "bash" "-c" (str "ls -hs --format=single-column " js-dir release-glob))))
 
 (defn rewrite-index
   "Rewrite the `index.html` for release.
