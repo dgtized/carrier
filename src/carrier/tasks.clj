@@ -10,6 +10,11 @@
     (println (format "[carrier] Cleaning %s" dir))
     (fs/delete-tree dir)))
 
+(defn clj-kondo [& dirs]
+  (bp/shell (str "clojure -Mclj-kondo --parallel --lint " (str/join " " dirs))))
+
+;; (clj-kondo "src")
+
 (defn revision-span
   "Generate a version span with time of build and git commit used to build."
   [timestamp sha]
